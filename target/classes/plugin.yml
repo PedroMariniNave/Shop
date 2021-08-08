@@ -1,0 +1,7 @@
+name: Shop
+description: Only a simple shop plugin.
+version: 1.0
+api-version: 1.16
+author: zPedroo_
+main: com.zpedroo.voltzshop.VoltzShop
+depend: [Vault]

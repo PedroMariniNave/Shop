@@ -1,0 +1,25 @@
+Inventory:
+  title: 'Loja - Exemplo'
+  size: 54
+  item-slots: 10, 11, 12
+  next-page-slot: 26 # só vai aparecer se tiver próxima página
+  previous-page-slot: 18 # só vai aparecer se tiver página anterior
+  displays:
+    1:
+      type: PLAYER_HEAD
+      owner: 'zPG0D'
+      name: '&a:)'
+  items:
+    1:
+      price: 20
+      # Item que vai mostrar no menu
+      display:
+        type: EMERALD
+        name: '&2Esmeralda'
+        lore:
+          - '&7Preço: &e{price}'
+      shop-item:
+        type: EMERALD
+        name: '&2Esmeralda'
+        lore:
+          - '&7Wooow esmeralda'

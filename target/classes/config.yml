@@ -1,0 +1,44 @@
+Settings:
+  command: loja
+  aliases: []
+
+Messages:
+  invalid-amount: '&6&lVoltz&f&lMC &8&l➜ &cA quantia informada é inválida!'
+  insufficient-money: '&6&lVoltz&f&lMC &8&l➜ &cVocê não possui coins suficientes! ({has}/{need})'
+  need-space: '&6&lVoltz&f&lMC &8&l➜ &cVocê não possui espaço suficiente no seu inventário! ({has}/{need})'
+  choose-amount:
+    - ''
+    - '&6&lVoltz&f&lMC &8&l➜ &7Digite no chat quantos itens deseja comprar!'
+    - ''
+    - ' &8▶ &7Comprando: &f{item}'
+    - ' &8▶ &7Preço: &e{price}'
+    - ''
+  successful-purchased:
+    - ''
+    - '&6&lVoltz&f&lMC &8&l➜ &7Compra efetuada com sucesso!'
+    - ''
+    - ' &8▶ &7Item adquirido: &f{item}'
+    - ' &8▶ &7Quantia: &fx{amount}'
+    - ' &8▶ &7Preço: &e{price}'
+    - ''
+
+Next-Page:
+  type: ARROW
+  name: '&aPróxima Página'
+
+Previous-Page:
+  type: ARROW
+  name: '&cPágina Anterior'
+
+NumberFormatter:
+  - "k"
+  - "M"
+  - "B"
+  - "T"
+  - "Q"
+  - "QQ"
+  - "S"
+  - "SS"
+  - "O"
+  - "N"
+  - "D"

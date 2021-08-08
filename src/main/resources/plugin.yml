@@ -1,0 +1,7 @@
+name: ${project.artifactId}
+description: ${project.description}
+version: ${project.version}
+api-version: 1.16
+author: zPedroo_
+main: com.zpedroo.voltzshop.VoltzShop
+depend: [Vault]
