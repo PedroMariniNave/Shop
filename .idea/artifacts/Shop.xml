@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" build-on-make="true" name="Shop">
-    <output-path>$USER_HOME$/Desktop/Testes/plugins</output-path>
+    <output-path>$USER_HOME$/Desktop/Rankup 3.0 Testes/plugins</output-path>
     <root id="archive" name="Shop.jar">
       <element id="module-output" name="Shop [Rankup Overpower]" />
     </root>

@@ -27,6 +27,7 @@ public class Menus {
     public static Menus getInstance() { return instance; }
 
     private InventoryUtils inventoryUtils;
+    
     private ItemStack nextPageItem;
     private ItemStack previousPageItem;
 
@@ -90,8 +91,6 @@ public class Menus {
             actions.add(new InventoryUtils.Action(InventoryUtils.ActionClick.ALL, display, () -> {
                 player.closeInventory();
                 PlayerChatListener.getPlayerChat().put(player, new PlayerChatListener.PlayerChat(player, item));
-                ItemStack toGive = item.getShopItem().clone();
-
                 for (String msg : Messages.CHOOSE_AMOUNT) {
                     if (msg == null) continue;
 
@@ -99,7 +98,7 @@ public class Menus {
                             "{item}",
                             "{price}"
                     }, new String[]{
-                            toGive.hasItemMeta() ? toGive.getItemMeta().hasDisplayName() ? toGive.getItemMeta().getDisplayName() : toGive.getType().toString() : toGive.getType().toString(),
+                            item.getDisplay().hasItemMeta() ? item.getDisplay().getItemMeta().hasDisplayName() ? item.getDisplay().getItemMeta().getDisplayName() : item.getDisplay().getType().toString() : item.getDisplay().getType().toString(),
                             NumberFormatter.getInstance().format(item.getPrice())
                     }));
                 }

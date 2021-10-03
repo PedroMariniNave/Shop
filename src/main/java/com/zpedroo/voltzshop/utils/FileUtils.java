@@ -1,11 +1,11 @@
 package com.zpedroo.voltzshop.utils;
 
-import com.zpedroo.voltzshop.VoltzShop;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,14 +17,12 @@ public class FileUtils {
     private static FileUtils instance;
     public static FileUtils get() { return instance; }
 
-    private static String CHARSET_NAME = "UTF-8";
-
-    private VoltzShop voltzShop;
+    private Plugin plugin;
     private Map<Files, FileManager> files;
 
-    public FileUtils(VoltzShop voltzShop) {
+    public FileUtils(Plugin plugin) {
         instance = this;
-        this.voltzShop = voltzShop;
+        this.plugin = plugin;
         this.files = new HashMap<>(Files.values().length);
 
         for (Files files : Files.values()) {
@@ -114,10 +112,10 @@ public class FileUtils {
         MAIN("main", "menus", "menus", false),
         EXAMPLE("example", "categories", "categories", true);
 
-        public String name;
-        public String resource;
-        public String folder;
-        public Boolean requireEmpty;
+        private String name;
+        private String resource;
+        private String folder;
+        private Boolean requireEmpty;
 
         Files(String name, String resource, String folder, Boolean requireEmpty) {
             this.name = name;
@@ -137,53 +135,57 @@ public class FileUtils {
         public String getFolder() {
             return folder;
         }
+
+        public Boolean requireEmpty() {
+            return requireEmpty;
+        }
     }
 
     public class FileManager {
 
-        private File pdfile;
-        private FileConfiguration language;
+        private File file;
+        private FileConfiguration fileConfig;
 
         public FileManager(Files file) {
-            this.pdfile = new File(voltzShop.getDataFolder() + (file.getFolder().isEmpty() ? "" : "/" + file.getFolder()), file.getName() + ".yml");
+            this.file = new File(plugin.getDataFolder() + (file.getFolder().isEmpty() ? "" : "/" + file.getFolder()), file.getName() + ".yml");
 
-            if (!pdfile.exists()) {
+            if (!this.file.exists()) {
                 if (file.requireEmpty) {
-                    File folder = new File(voltzShop.getDataFolder(), "/categories");
+                    File folder = new File(plugin.getDataFolder(), file.getFolder());
                     if (folder.listFiles() != null) {
                         if (Stream.of(folder.listFiles()).map(YamlConfiguration::loadConfiguration).count() > 0) return;
                     }
                 }
 
                 try {
-                    pdfile.getParentFile().mkdirs();
-                    pdfile.createNewFile();
+                    this.file.getParentFile().mkdirs();
+                    this.file.createNewFile();
 
-                    copy(voltzShop.getResource((file.getResource().isEmpty() ? "" : file.getResource() + "/") + file.getName() + ".yml"), pdfile);
+                    copy(plugin.getResource((file.getResource().isEmpty() ? "" : file.getResource() + "/") + file.getName() + ".yml"), this.file);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
 
             try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(pdfile), CHARSET_NAME));
-                language = YamlConfiguration.loadConfiguration(reader);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(this.file), StandardCharsets.UTF_8));
+                fileConfig = YamlConfiguration.loadConfiguration(reader);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
 
         public FileConfiguration get() {
-            return language;
+            return fileConfig;
         }
 
         public File getFile() {
-            return pdfile;
+            return file;
         }
 
         public void save() {
             try {
-                language.save(pdfile);
+                fileConfig.save(file);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -191,7 +193,7 @@ public class FileUtils {
 
         public void reload() {
             try {
-                language = YamlConfiguration.loadConfiguration(pdfile);
+                fileConfig = YamlConfiguration.loadConfiguration(file);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

@@ -37,6 +37,7 @@ public class ShopManager {
             if (fl == null) continue;
 
             YamlConfiguration file = YamlConfiguration.loadConfiguration(fl);
+
             String name = fl.getName().replace(".yml", "");
             String title = ChatColor.translateAlternateColorCodes('&', file.getString("Inventory.title", "NULL"));
             Integer size = file.getInt("Inventory.size");
@@ -46,14 +47,19 @@ public class ShopManager {
                 if (str == null) continue;
 
                 BigInteger price = new BigInteger(file.getString("Inventory.items." + str + ".price", "0"));
+                Integer defaultAmount = file.getInt("Inventory.items." + str + ".default-amount", 1);
                 ItemStack display = ItemBuilder.build(file, "Inventory.items." + str + ".display", new String[]{
                         "{price}"
                 }, new String[]{
                         NumberFormatter.getInstance().format(price)
                 }).build();
-                ItemStack shopItem = ItemBuilder.build(file, "Inventory.items." + str + ".shop-item").build();
+                ItemStack shopItem = null;
+                if (file.contains("Inventory.items." + str + ".shop-item")) {
+                    shopItem = ItemBuilder.build(file, "Inventory.items." + str + ".shop-item").build();
+                }
+                List<String> commands = file.getStringList("Inventory.items." + str + ".commands");
 
-                items.add(new CategoryItem(price, display, shopItem));
+                items.add(new CategoryItem(price, defaultAmount, display, shopItem, commands));
             }
 
             Category category = new Category(file, title, size, items);

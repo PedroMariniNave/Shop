@@ -19,6 +19,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +30,9 @@ public class ItemBuilder {
     private ItemStack item;
     private Integer slot;
     private List<InventoryUtils.Action> actions;
+
+    private static Method metaSetProfileMethod;
+    private static Field metaProfileField;
 
     public ItemBuilder(Material material, int amount, short durability, Integer slot, List<InventoryUtils.Action> actions) {
         if (StringUtils.equals(material.toString(), "PLAYER_HEAD")) {
@@ -224,24 +229,46 @@ public class ItemBuilder {
         item.setItemMeta(meta);
     }
 
-    private void setCustomTexture(String url) {
-        if (url == null || url.isEmpty()) return;
+    private void setCustomTexture(String base64) {
+        if (base64 == null || base64.isEmpty()) return;
 
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        if (meta == null) return;
-
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-        profile.getProperties().put("textures", new Property("textures", url));
-
-        try {
-            Field field = meta.getClass().getDeclaredField("profile");
-            field.setAccessible(true);
-            field.set(meta, profile);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
+        mutateItemMeta(meta, base64);
         item.setItemMeta(meta);
+    }
+
+    private void mutateItemMeta(SkullMeta meta, String b64) {
+        try {
+            if (metaSetProfileMethod == null) {
+                metaSetProfileMethod = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
+                metaSetProfileMethod.setAccessible(true);
+            }
+            metaSetProfileMethod.invoke(meta, makeProfile(b64));
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            // if in an older API where there is no setProfile method,
+            // we set the profile field directly.
+            try {
+                if (metaProfileField == null) {
+                    metaProfileField = meta.getClass().getDeclaredField("profile");
+                    metaProfileField.setAccessible(true);
+                }
+                metaProfileField.set(meta, makeProfile(b64));
+
+            } catch (NoSuchFieldException | IllegalAccessException ex2) {
+                ex2.printStackTrace();
+            }
+        }
+    }
+
+    private GameProfile makeProfile(String b64) {
+        // random uuid based on the b64 string
+        UUID id = new UUID(
+                b64.substring(b64.length() - 20).hashCode(),
+                b64.substring(b64.length() - 10).hashCode()
+        );
+        GameProfile profile = new GameProfile(id, "Player");
+        profile.getProperties().put("textures", new Property("textures", b64));
+        return profile;
     }
 
     public ItemStack build() {
